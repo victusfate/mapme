@@ -1,3 +1,3 @@
-require 'myapp'
+require 'mapme'
 run Sinatra::Application
 
