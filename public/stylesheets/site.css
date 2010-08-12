@@ -1,6 +1,6 @@
 body {
 /*  background: url("/images/background.jpg") 0% 0% no-repeat; */
-  background-image:url('/images/background.jpg');
+  background-image:url('/images/background.jpg'); 
   background-repeat:no-repeat;
   background-position:center 25%;
   width: 100%;
