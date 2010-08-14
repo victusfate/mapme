@@ -35,62 +35,78 @@
 // Note that using Google Gears requires loading the Javascript
 // at http://code.google.com/apis/gears/gears_init.js
 
-var initialLocation;
 var siberia = new google.maps.LatLng(60, 105);
 var newyork = new google.maps.LatLng(40.69847032728747, -73.9514422416687);
 var browserSupportFlag =  new Boolean();
 
+  function get_location(map,setLocation) {
+    var initialLocation;
+
+    // Try W3C Geolocation (Preferred)
+    if(navigator.geolocation) {
+      browserSupportFlag = true;
+      navigator.geolocation.getCurrentPosition(function(position) {
+        initialLocation = new google.maps.LatLng(position.coords.latitude,position.coords.longitude);
+//        alert('navigator.geolocation set position '+initialLocation);
+        setLocation(map,initialLocation);
+
+      }, function() {
+        handleNoGeolocation(browserSupportFlag,initialLocation);
+        setLocation(map,initialLocation);
+      });
+      // Try Google Gears Geolocation
+    } else if (google.gears) {
+      browserSupportFlag = true;
+      var geo = google.gears.factory.create('beta.geolocation');
+      geo.getCurrentPosition(function(position) {
+        initialLocation = new google.maps.LatLng(position.latitude,position.longitude);
+//        alert('google.gears set position '+initialLocation);
+        setLocation(map,initialLocation);
+      }, function() {
+        handleNoGeoLocation(browserSupportFlag,initialLocation);
+        setLocation(map,initialLocation);
+      });
+      // Browser doesn't support Geolocation
+    } else {
+      browserSupportFlag = false;
+      handleNoGeolocation(browserSupportFlag,initialLocation);
+//      alert('nogeolocation set position '+initialLocation);
+      setLocation(map,initialLocation);
+    }
+  }
+
+
+function handleNoGeolocation(errorFlag,initialLocation) {
+  if (errorFlag == true) {
+    alert("Geolocation service failed.");
+    initialLocation = newyork;
+  } else {
+    alert("Your browser doesn't support geolocation. We've placed you in Siberia.");
+    initialLocation = siberia;
+  }
+  return initialLocation;
+}
+
 
 function initialize() {
   var myOptions = {
-    zoom: 16,
-    mapTypeId: google.maps.MapTypeId.ROADMAP
+      zoom: 16,
+      mapTypeId: google.maps.MapTypeId.ROADMAP
   };
   var map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+  get_location(map,setLocation);
 
   // move into get location function
   //
-  // Try W3C Geolocation (Preferred)
-  if(navigator.geolocation) {
-    browserSupportFlag = true;
-    navigator.geolocation.getCurrentPosition(function(position) {
-      initialLocation = new google.maps.LatLng(position.coords.latitude,position.coords.longitude);
-      map.setCenter(initialLocation);
-    }, function() {
-      handleNoGeolocation(browserSupportFlag);
-    });
-  // Try Google Gears Geolocation
-  } else if (google.gears) {
-    browserSupportFlag = true;
-    var geo = google.gears.factory.create('beta.geolocation');
-    geo.getCurrentPosition(function(position) {
-      initialLocation = new google.maps.LatLng(position.latitude,position.longitude);
-      map.setCenter(initialLocation);
-    }, function() {
-      handleNoGeoLocation(browserSupportFlag);
-    });
-  // Browser doesn't support Geolocation
-  } else {
-    browserSupportFlag = false;
-    handleNoGeolocation(browserSupportFlag);
-  }
 
-  function handleNoGeolocation(errorFlag) {
-    if (errorFlag == true) {
-      alert("Geolocation service failed.");
-      initialLocation = newyork;
-    } else {
-      alert("Your browser doesn't support geolocation. We've placed you in Siberia.");
-      initialLocation = siberia;
-    }
-    map.setCenter(initialLocation);
-  }
 }
 
-function setLocation() {
+function setLocation(map,initialLocation) {
     if (initialLocation) {
+//      alert('setLocation initiallocation exists '+initialLocation);
+//      alert('map '+map);
+      map.setCenter(initialLocation);
       var image = '/images/red_GarageSale.png';
-      alert('initiallocation '+initialLocation);
       var garageSaleLocation = initialLocation; // new google.maps.LatLng(-33.890542, 151.274856);
       var saleMarker = new google.maps.Marker({
         position: garageSaleLocation,
@@ -100,7 +116,8 @@ function setLocation() {
       });
     }
     if (!initialLocation) {
-      setTimeout(setLocation(),1250);
+      alert('setLocation initialLocation undefined '+initialLocation);
+//      setTimeout(setLocation(),1250);
     }
 }
 
@@ -109,7 +126,7 @@ $(document).ready(function () {
     initialize();
 //    while (!initialLocation) {
 //    }
-    setTimeout(setLocation(),1250);
+//    setTimeout(setLocation(),1250);
 //  });
 
 });
