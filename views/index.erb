@@ -1,8 +1,6 @@
 
 <div id="welcometext" class="leftside">
-	<br/>
 	Welcome to mapme
-        <br/><br/>
 </div>
 
 <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
@@ -42,6 +40,7 @@ var siberia = new google.maps.LatLng(60, 105);
 var newyork = new google.maps.LatLng(40.69847032728747, -73.9514422416687);
 var browserSupportFlag =  new Boolean();
 
+
 function initialize() {
   var myOptions = {
     zoom: 16,
@@ -49,6 +48,8 @@ function initialize() {
   };
   var map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
 
+  // move into get location function
+  //
   // Try W3C Geolocation (Preferred)
   if(navigator.geolocation) {
     browserSupportFlag = true;
@@ -73,15 +74,6 @@ function initialize() {
     browserSupportFlag = false;
     handleNoGeolocation(browserSupportFlag);
   }
-  var image = '/images/red_GarageSale.png';
-  //alert(initialLocation);
-  var garageSaleLocation = initialLocation; // new google.maps.LatLng(-33.890542, 151.274856);
-  var saleMarker = new google.maps.Marker({
-      position: garageSaleLocation,
-      map: map,
-      title:"First Marker"
- //     icon: image
-  });
 
   function handleNoGeolocation(errorFlag) {
     if (errorFlag == true) {
@@ -95,6 +87,32 @@ function initialize() {
   }
 }
 
+function setLocation() {
+    if (initialLocation) {
+      var image = '/images/red_GarageSale.png';
+      alert('initiallocation '+initialLocation);
+      var garageSaleLocation = initialLocation; // new google.maps.LatLng(-33.890542, 151.274856);
+      var saleMarker = new google.maps.Marker({
+        position: garageSaleLocation,
+        map: map,
+        title:"First Marker"
+        //     icon: image
+      });
+    }
+    if (!initialLocation) {
+      setTimeout(setLocation(),1250);
+    }
+}
+
+$(document).ready(function () {
+//  (function(initialLocation) {
+    initialize();
+//    while (!initialLocation) {
+//    }
+    setTimeout(setLocation(),1250);
+//  });
+
+});
 
 </script>
 
